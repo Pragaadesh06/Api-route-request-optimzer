@@ -1,0 +1,37 @@
+[
+    {
+        "directory": "c:/Users/Pragaadesh/OneDrive/Desktop/DSA -  API Requst Route/backend/c_engine",
+        "command": "C:/Users/Pragaadesh/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/gcc.exe -Wall -Wextra -c graph.c -o graph.o",
+        "file": "graph.c"
+    },
+    {
+        "directory": "c:/Users/Pragaadesh/OneDrive/Desktop/DSA -  API Requst Route/backend/c_engine",
+        "command": "C:/Users/Pragaadesh/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/gcc.exe -Wall -Wextra -c main.c -o main.o",
+        "file": "main.c"
+    },
+    {
+        "directory": "c:/Users/Pragaadesh/OneDrive/Desktop/DSA -  API Requst Route/backend/c_engine",
+        "command": "C:/Users/Pragaadesh/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/gcc.exe -Wall -Wextra -c test_engine.c -o test_engine.o",
+        "file": "test_engine.c"
+    },
+    {
+        "directory": "c:/Users/Pragaadesh/OneDrive/Desktop/DSA -  API Requst Route/backend/c_engine",
+        "command": "C:/Users/Pragaadesh/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/gcc.exe -Wall -Wextra -c input_parser.c -o input_parser.o",
+        "file": "input_parser.c"
+    },
+    {
+        "directory": "c:/Users/Pragaadesh/OneDrive/Desktop/DSA -  API Requst Route/backend/c_engine",
+        "command": "C:/Users/Pragaadesh/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/gcc.exe -Wall -Wextra -c output.c -o output.o",
+        "file": "output.c"
+    },
+    {
+        "directory": "c:/Users/Pragaadesh/OneDrive/Desktop/DSA -  API Requst Route/backend/c_engine",
+        "command": "C:/Users/Pragaadesh/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/gcc.exe -Wall -Wextra -c priority_queue.c -o priority_queue.o",
+        "file": "priority_queue.c"
+    },
+    {
+        "directory": "c:/Users/Pragaadesh/OneDrive/Desktop/DSA -  API Requst Route/backend/c_engine",
+        "command": "C:/Users/Pragaadesh/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/gcc.exe -Wall -Wextra -c routing.c -o routing.o",
+        "file": "routing.c"
+    }
+]

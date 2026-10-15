@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RouteFlow | API Request Route Optimizer</title>
+    <meta name="description" content="Model APIs as a weighted graph and compare Dijkstra, BFS, and DFS through a real C-based DSA engine.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+    <!-- Background Canvas for Network Animation -->
+    <canvas id="networkCanvas" aria-hidden="true"></canvas>
+    <div class="vignette"></div>
+
+    <nav class="navbar">
+        <div class="brand">
+            <svg class="brand-logo" viewBox="0 0 40 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="RouteFlow Logo">
+                <path d="M2 10 Q 10 2, 20 10 T 38 10" stroke="currentColor" stroke-width="2" fill="transparent" stroke-linecap="round"/>
+                <circle cx="2" cy="10" r="2.5" fill="currentColor"/>
+                <circle cx="20" cy="10" r="2.5" fill="currentColor"/>
+                <circle cx="38" cy="10" r="2.5" fill="currentColor"/>
+            </svg>
+            <span class="brand-name">RouteFlow</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#how-it-works">Architecture</a></li>
+            <li><a href="#algorithms">Algorithms</a></li>
+            <li><a href="#graph-builder-section">Visualizer</a></li>
+        </ul>
+        <button class="nav-cta" onclick="document.querySelector('.interaction-panel').scrollIntoView({behavior: 'smooth', block: 'center'})">Launch Optimizer</button>
+    </nav>
+
+    <main class="hero">
+        <div class="hero-content">
+            <div class="badge animate-fade-in">
+                <span class="badge-dot"></span>
+                API REQUEST ROUTE OPTIMIZER
+            </div>
+            
+            <h1 class="main-heading" id="heroHeading">
+                Find the Best Route for Every API Request
+            </h1>
+            
+            <p class="subheading animate-fade-in-delay-1">
+                Model APIs as a weighted graph, explore network paths, and compare Dijkstra, BFS, and DFS through a real C-based DSA engine.
+            </p>
+            
+            <div class="interaction-panel animate-slide-up">
+                <div class="input-group">
+                    <label for="sourceNode">Source API</label>
+                    <select id="sourceNode" class="glass-select" aria-label="Source Node"></select>
+                </div>
+                
+                <div class="input-divider">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </div>
+                
+                <div class="input-group">
+                    <label for="destinationNode">Destination API</label>
+                    <select id="destinationNode" class="glass-select" aria-label="Destination Node"></select>
+                </div>
+
+                <div class="input-divider">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                    </svg>
+                </div>
+
+                <div class="input-group">
+                    <label for="algorithmSelect">Algorithm</label>
+                    <select id="algorithmSelect" class="glass-select" aria-label="Routing Algorithm">
+                        <option value="Dijkstra">Dijkstra</option>
+                        <option value="BFS">BFS</option>
+                        <option value="DFS">DFS</option>
+                    </select>
+                </div>
+                
+                <button class="primary-btn" id="findRouteBtn">
+                    <span>Find Optimal Route</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+                <div class="status-indicator animate-fade-in-delay-2 connecting">
+                    <div class="status-dot-container">
+                        <div class="status-dot-pulse"></div>
+                        <div class="status-dot-core" id="statusDot"></div>
+                    </div>
+                    <div class="status-text">
+                        <span class="status-message" id="engineStatus" style="font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; margin-top: 0;">CHECKING C ENGINE...</span>
+                    </div>
+                </div>
+
+                <!-- Route Result Container -->
+                <div class="route-result-container hidden" id="routeResultContainer">
+                    <div class="result-header">
+                        <h3 id="resultHeaderTitle">ROUTING RESULT</h3>
+                    </div>
+                    
+                    <div class="execution-metrics-banner">
+                        <div class="metric">
+                            <span class="m-label">Execution Time</span>
+                            <span class="m-value" id="resTime">0.0ms</span>
+                        </div>
+                        <div class="metric">
+                            <span class="m-label">Nodes Visited</span>
+                            <span class="m-value" id="resVisited">0</span>
+                        </div>
+                        <div class="metric">
+                            <span class="m-label">Edges Evaluated</span>
+                            <span class="m-value" id="resEdges">0</span>
+                        </div>
+                        <div class="metric" id="metricCostContainer">
+                            <span class="m-label">Total Cost</span>
+                            <span class="m-value highlight" id="resCost">0</span>
+                        </div>
+                    </div>
+
+                    <div class="computed-path-label" id="computedPathLabel">COMPUTED PATH</div>
+                    
+                    <div class="route-visualization" id="resRoutePath">
+                        <!-- Route nodes -->
+                    </div>
+
+                    <div class="result-actions" style="margin-top: 1.25rem; display: flex; justify-content: center; gap: 0.75rem;">
+                        <button class="secondary-btn" id="viewOnGraphBtn" type="button">
+                            <span>Inspect on Visualizer ↓</span>
+                        </button>
+                    </div>
+                </div>
+        </div>
+    </main>
+
+    <section class="educational-section" id="how-it-works">
+        <div class="edu-container">
+            <h2>How RouteFlow Works</h2>
+            <p class="edu-desc">Every API/service is modeled as a graph node. Connections are directed edges, and routing costs represent the effort required to move between services. The C engine performs the actual graph processing and returns the result to the interface.</p>
+            
+            <div class="pipeline-viz">
+                <div class="pipe-node">USER REQUEST</div>
+                <div class="pipe-arrow">↓</div>
+                <div class="pipe-node">GRAPH MODEL</div>
+                <div class="pipe-arrow">↓</div>
+                <div class="pipe-node">DSA ALGORITHM</div>
+                <div class="pipe-arrow">↓</div>
+                <div class="pipe-node highlight">C ROUTING ENGINE</div>
+                <div class="pipe-arrow">↓</div>
+                <div class="pipe-node">OPTIMAL / TRAVERSAL RESULT</div>
+                <div class="pipe-arrow">↓</div>
+                <div class="pipe-node">VISUALIZATION</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="educational-section" id="system-architecture">
+        <div class="edu-container">
+            <h2>System Architecture</h2>
+            <div class="architecture-grid">
+                <div class="arch-col">
+                    <div class="arch-box frontend">FRONTEND<br><span>HTML / CSS / JS</span></div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-box bridge">FASTAPI BRIDGE<br><span>Python</span></div>
+                    <div class="arch-arrow">↓</div>
+                    <div class="arch-box engine">C DSA ENGINE<br><span>engine.exe</span></div>
+                </div>
+                <div class="arch-col details">
+                    <div class="arch-detail">
+                        <h4>Graph Representation</h4>
+                        <span class="tag">Adjacency List</span>
+                    </div>
+                    <div class="arch-detail">
+                        <h4>Routing Algorithms</h4>
+                        <span class="tag">Dijkstra</span>
+                        <span class="tag">BFS</span>
+                        <span class="tag">DFS</span>
+                    </div>
+                    <div class="arch-detail">
+                        <h4>Core Data Structures</h4>
+                        <span class="tag">Binary Min-Heap</span>
+                        <span class="tag">Queue</span>
+                        <span class="tag">Stack / Recursion</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="educational-section" id="project-statistics">
+        <div class="edu-container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="s-number">3</div>
+                    <div class="s-text">Algorithms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="s-number">1</div>
+                    <div class="s-text">C Routing Engine</div>
+                </div>
+                <div class="stat-card">
+                    <div class="s-number">1</div>
+                    <div class="s-text">Graph Model</div>
+                </div>
+                <div class="stat-card">
+                    <div class="s-number">100%</div>
+                    <div class="s-text">Local / Offline Architecture</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="educational-section" id="algorithms">
+        <div class="edu-container">
+            <h2>Algorithm Implementations</h2>
+            <div class="cards-grid">
+                <div class="algo-card dijkstra">
+                    <h3>Dijkstra</h3>
+                    <p>Finds the minimum-cost path between nodes when all edge costs are non-negative.</p>
+                    <hr>
+                    <div class="card-meta"><span>Role:</span> Weighted shortest-path optimization</div>
+                    <div class="card-meta"><span>Structure:</span> Adjacency List + Binary Min-Heap</div>
+                    <div class="card-meta"><span>Complexity:</span> O((V + E) log V)</div>
+                </div>
+                <div class="algo-card bfs">
+                    <h3>Breadth-First Search</h3>
+                    <p>Explores the graph level by level using a queue.</p>
+                    <hr>
+                    <div class="card-meta"><span>Role:</span> Unweighted traversal</div>
+                    <div class="card-meta"><span>Structure:</span> Adjacency List + Queue</div>
+                    <div class="card-meta"><span>Complexity:</span> O(V + E)</div>
+                </div>
+                <div class="algo-card dfs">
+                    <h3>Depth-First Search</h3>
+                    <p>Explores deeply along a path before backtracking.</p>
+                    <hr>
+                    <div class="card-meta"><span>Role:</span> Graph traversal</div>
+                    <div class="card-meta"><span>Structure:</span> Adjacency List + Stack/Recursion</div>
+                    <div class="card-meta"><span>Complexity:</span> O(V + E)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="educational-section" id="data-structures">
+        <div class="edu-container">
+            <h2>Core Data Structures</h2>
+            <div class="ds-grid">
+                <div class="ds-item">
+                    <h4>Adjacency List</h4>
+                    <p><strong>Used for:</strong> Graph Representation</p>
+                    <p><strong>Why:</strong> Efficient representation of sparse API/service networks.</p>
+                </div>
+                <div class="ds-item">
+                    <h4>Binary Min-Heap</h4>
+                    <p><strong>Used by:</strong> Dijkstra</p>
+                    <p><strong>Why:</strong> Quickly selects the next lowest-cost node during exploration.</p>
+                </div>
+                <div class="ds-item">
+                    <h4>Queue</h4>
+                    <p><strong>Used by:</strong> BFS</p>
+                    <p><strong>Why:</strong> Maintains strict level-by-level processing order.</p>
+                </div>
+                <div class="ds-item">
+                    <h4>Stack / Recursion</h4>
+                    <p><strong>Used by:</strong> DFS</p>
+                    <p><strong>Why:</strong> Allows deep exploration and automatic backtracking.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="app-section" id="graph-builder-section">
+        <div class="section-container two-col">
+            <div class="builder-panel glass-panel">
+                <div class="panel-header">
+                    <h2>Graph Builder</h2>
+                    <div class="graph-stats">
+                        <span id="statNodeCount">Nodes: 0</span> | 
+                        <span id="statEdgeCount">Edges: 0</span>
+                    </div>
+                </div>
+                
+                <div class="builder-controls">
+                    <div class="builder-group">
+                        <h3>Add Node</h3>
+                        <div class="input-row">
+                            <input type="text" id="newNodeName" placeholder="e.g. Cache_Service" maxlength="63" class="glass-input" aria-label="New Node Name">
+                            <button id="addNodeBtn" class="secondary-btn" type="button">Add</button>
+                        </div>
+                    </div>
+                    
+                    <div class="builder-group">
+                        <h3>Add Edge</h3>
+                        <div class="input-row edge-row">
+                            <select id="newEdgeFrom" class="glass-select" aria-label="Edge Source"></select>
+                            <span class="arrow-span">→</span>
+                            <select id="newEdgeTo" class="glass-select" aria-label="Edge Destination"></select>
+                            <input type="number" id="newEdgeCost" placeholder="Cost" min="0" class="glass-input num-input" aria-label="Edge Cost">
+                            <button id="addEdgeBtn" class="secondary-btn" type="button">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Active Node List -->
+                    <div class="builder-group">
+                        <div class="list-header-row">
+                            <h3>Current Nodes</h3>
+                            <span class="hint-muted">Click × to remove</span>
+                        </div>
+                        <div class="tag-cloud" id="nodeTagList"></div>
+                    </div>
+
+                    <!-- Active Edge List -->
+                    <div class="builder-group">
+                        <div class="list-header-row">
+                            <h3>Current Edges</h3>
+                            <span class="hint-muted">Click × to remove</span>
+                        </div>
+                        <div class="edge-list-box" id="edgeListBox"></div>
+                    </div>
+                    
+                    <div class="builder-group dropdown-remove-group">
+                        <h3>Quick Dropdown Remove</h3>
+                        <div class="input-row">
+                            <select id="removeNodeSelect" class="glass-select" aria-label="Node to Remove"></select>
+                            <button id="removeNodeBtn" class="danger-btn" type="button">Delete Node</button>
+                        </div>
+                        <div class="input-row" style="margin-top: 0.5rem;">
+                            <select id="removeEdgeSelect" class="glass-select" aria-label="Edge to Remove"></select>
+                            <button id="removeEdgeBtn" class="danger-btn" type="button">Delete Edge</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization-panel glass-panel">
+                <div class="panel-header">
+                    <h2>Graph Visualization</h2>
+                    <div class="viz-actions">
+                        <button id="resetLayoutBtn" class="text-btn" title="Reset layout positions">Auto-Layout</button>
+                        <button id="clearRouteHighlightBtn" class="text-btn" title="Clear highlighted path">Clear Highlight</button>
+                    </div>
+                </div>
+
+                <div class="canvas-legend">
+                    <span class="legend-item"><span class="legend-dot source"></span> Source</span>
+                    <span class="legend-item"><span class="legend-dot dest"></span> Dest</span>
+                    <span class="legend-item"><span class="legend-dot active"></span> Active Route</span>
+                    <span class="legend-item"><span class="legend-dot regular"></span> Service</span>
+                </div>
+
+                <div class="canvas-container" id="fgCanvasContainer">
+                    <canvas id="foregroundCanvas" aria-label="Graph Visualization Canvas"></canvas>
+                    <div class="canvas-tip">💡 Drag any node to reposition on canvas</div>
+                </div>
+
+                <div class="viz-inline-run" style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
+                    <div class="quick-status" id="vizStatusNotice" style="font-size: 0.8rem; color: var(--text-muted);">
+                        Graph in sync with routing model
+                    </div>
+                    <button class="primary-btn" id="vizRunBtn" type="button" style="padding: 0.6rem 1.25rem; font-size: 0.85rem;">
+                        <span>Run Selected Algorithm</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="app-section" id="insight-history-section">
+        <div class="section-container two-col">
+            <div class="insight-panel glass-panel">
+                <div class="panel-header">
+                    <h2>Explain This Algorithm</h2>
+                    <button id="toggleExplainBtn" class="text-btn">Hide</button>
+                </div>
+                <div class="insight-content" id="explainContent">
+                    <h3 id="explainAlgoName">Dijkstra</h3>
+                    <ol id="explainAlgoSteps" class="explain-steps">
+                        <li>Start at the source.</li>
+                        <li>Give the source distance 0.</li>
+                        <li>Select the currently cheapest unprocessed node using the min-heap.</li>
+                        <li>Relax its outgoing edges.</li>
+                        <li>Update cheaper distances when found.</li>
+                        <li>Repeat until the destination is settled or no nodes remain.</li>
+                        <li>Reconstruct the path using predecessors.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="history-panel glass-panel">
+                <div class="panel-header">
+                    <h2>REQUEST HISTORY</h2>
+                    <button id="clearHistoryBtn" class="text-btn">Clear</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="empty-state">No requests yet.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="educational-section" id="why-it-matters">
+        <div class="edu-container">
+            <h2>Why Route Optimization Matters</h2>
+            <p class="edu-desc" style="text-align: center; max-width: 800px; margin: 0 auto;">
+                This project demonstrates how core graph algorithms can model service-to-service request routing. By applying DSA concepts to API gateways, microservices, and distributed service communication, we can mathematically determine the most efficient network paths.
+            </p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 RouteFlow &mdash; API Request Route Optimizer &bull; Final Year DSA Project</p>
+    </footer>
+
+    <script src="script.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+ALGORITHM Dijkstra
+SOURCE API_Gateway
+DESTINATION Payment_Service
+GRAPH:
+API_Gateway Auth_Service 2
+API_Gateway Product_Service 3
+Auth_Service User_Service 1
+Auth_Service Order_Service 5
+User_Service Order_Service 2
+Product_Service Order_Service 4
+Order_Service Payment_Service 6
+Order_Service Notification_Service 1
+Payment_Service Notification_Service 2
+API_Gateway Payment_Service 20

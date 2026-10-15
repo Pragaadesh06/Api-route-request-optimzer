@@ -1,0 +1,44 @@
+{
+  "algorithm": "Dijkstra",
+  "source": "API_Gateway",
+  "destination": "Payment_Service",
+  "nodes": [
+    "API_Gateway",
+    "Auth_Service",
+    "User_Service",
+    "Order_Service",
+    "Payment_Service"
+  ],
+  "edges": [
+    {
+      "from": "API_Gateway",
+      "to": "Auth_Service",
+      "cost": 2
+    },
+    {
+      "from": "Auth_Service",
+      "to": "User_Service",
+      "cost": 1
+    },
+    {
+      "from": "Auth_Service",
+      "to": "Order_Service",
+      "cost": 5
+    },
+    {
+      "from": "User_Service",
+      "to": "Order_Service",
+      "cost": 2
+    },
+    {
+      "from": "Order_Service",
+      "to": "Payment_Service",
+      "cost": 6
+    },
+    {
+      "from": "API_Gateway",
+      "to": "Payment_Service",
+      "cost": 20
+    }
+  ]
+}
