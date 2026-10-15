@@ -126,20 +126,20 @@ function initGraphApp() {
 
     function computeDefaultPositions(w, h) {
         const pos = {};
-        const padX = 85;
-        const padY = 65;
+        const padX = 90;
+        const padY = 75;
         const innerW = Math.max(w - padX * 2, 280);
         const innerH = Math.max(h - padY * 2, 240);
 
         // Architectural tiers for microservices demo
         const tiers = {
-            "API_Gateway": { col: 0.0, row: 0.5 },
-            "Auth_Service": { col: 0.28, row: 0.18 },
-            "Product_Service": { col: 0.28, row: 0.82 },
-            "User_Service": { col: 0.52, row: 0.18 },
-            "Order_Service": { col: 0.68, row: 0.5 },
-            "Payment_Service": { col: 0.95, row: 0.24 },
-            "Notification_Service": { col: 0.95, row: 0.76 }
+            "API_Gateway": { col: 0.04, row: 0.5 },
+            "Auth_Service": { col: 0.28, row: 0.24 },
+            "Product_Service": { col: 0.28, row: 0.76 },
+            "User_Service": { col: 0.52, row: 0.24 },
+            "Order_Service": { col: 0.70, row: 0.5 },
+            "Payment_Service": { col: 0.88, row: 0.24 },
+            "Notification_Service": { col: 0.88, row: 0.76 }
         };
 
         graph.nodes.forEach((node, i) => {
@@ -149,13 +149,14 @@ function initGraphApp() {
                     y: padY + tiers[node].row * innerH
                 };
             } else {
-                // Dynamically added nodes positioned in free space or circular distribution
-                const angle = (i / graph.nodes.length) * 2 * Math.PI - Math.PI / 2;
-                const rx = innerW * 0.42;
-                const ry = innerH * 0.42;
+                // Dynamically added nodes positioned in open space
+                const dynamicNodes = graph.nodes.filter(n => !tiers[n]);
+                const dynIdx = dynamicNodes.indexOf(node);
+                const count = dynamicNodes.length;
+                const arcAngle = Math.PI * 0.25 + (dynIdx / Math.max(count, 1)) * (Math.PI * 0.5);
                 pos[node] = {
-                    x: w / 2 + rx * Math.cos(angle),
-                    y: h / 2 + ry * Math.sin(angle)
+                    x: padX + 0.40 * innerW + Math.cos(arcAngle) * (innerW * 0.18),
+                    y: padY + 0.50 * innerH - Math.sin(arcAngle) * (innerH * 0.24)
                 };
             }
         });
@@ -246,14 +247,20 @@ function initGraphApp() {
 
             if (hasReverse || isBypass) {
                 // Curved quadratic bezier
-                const perpX = -uy;
-                const perpY = ux;
-                const curveOffset = isBypass ? -65 : (hasReverse ? 30 : 0);
-
-                const midX = (startX + endX) / 2;
-                const midY = (startY + endY) / 2;
-                const ctrlX = midX + perpX * curveOffset;
-                const ctrlY = midY + perpY * curveOffset;
+                let ctrlX, ctrlY;
+                if (isBypass) {
+                    // Arch cleanly over top nodes (Auth_Service, User_Service)
+                    ctrlX = (startX + endX) / 2;
+                    ctrlY = -50;
+                } else {
+                    const perpX = -uy;
+                    const perpY = ux;
+                    const curveOffset = 32;
+                    const midX = (startX + endX) / 2;
+                    const midY = (startY + endY) / 2;
+                    ctrlX = midX + perpX * curveOffset;
+                    ctrlY = midY + perpY * curveOffset;
+                }
 
                 fgCtx.moveTo(startX, startY);
                 fgCtx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
@@ -412,20 +419,25 @@ function initGraphApp() {
                 fgCtx.restore();
             }
 
-            // Node Label below marker
+            // Node Label below or above marker based on vertical position
             fgCtx.save();
             fgCtx.font = '600 11.5px Inter, sans-serif';
             fgCtx.textAlign = 'center';
-            fgCtx.textBaseline = 'top';
+            
+            // If node is in upper half of canvas, render label ABOVE the node marker;
+            // if in lower half or middle, render BELOW the node marker.
+            // This prevents labels of Auth_Service and User_Service from colliding with horizontal/cross edges.
+            const isUpper = pos.y < h * 0.45;
+            const labelY = isUpper ? (pos.y - NODE_RADIUS - 6) : (pos.y + NODE_RADIUS + 6);
+            fgCtx.textBaseline = isUpper ? 'bottom' : 'top';
 
-            // Text halo for contrast
-            fgCtx.fillStyle = '#06080a';
-            fgCtx.fillText(node, pos.x + 1, pos.y + NODE_RADIUS + 7);
-            fgCtx.fillText(node, pos.x - 1, pos.y + NODE_RADIUS + 7);
-            fgCtx.fillText(node, pos.x, pos.y + NODE_RADIUS + 8);
+            // High-contrast halo outline so text is always crisp over any edge lines
+            fgCtx.lineWidth = 3.5;
+            fgCtx.strokeStyle = 'rgba(6, 8, 10, 0.95)';
+            fgCtx.strokeText(node, pos.x, labelY);
 
             fgCtx.fillStyle = isInRoute ? '#34d399' : (isSource ? '#93c5fd' : (isDest ? '#e9d5ff' : '#f1f5f9'));
-            fgCtx.fillText(node, pos.x, pos.y + NODE_RADIUS + 7);
+            fgCtx.fillText(node, pos.x, labelY);
             fgCtx.restore();
         });
     }

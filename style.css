@@ -728,6 +728,11 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
 }
+#graph-builder-section .section-container.two-col {
+    grid-template-columns: 360px 1fr;
+    max-width: 1320px;
+    width: 95%;
+}
 .glass-panel {
     background: var(--bg-panel);
     border: 1px solid var(--border-subtle);
@@ -963,6 +968,7 @@ body {
     gap: 0.35rem;
     max-height: 140px;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 0.25rem 0.1rem;
 }
 
@@ -987,7 +993,11 @@ body {
 .edge-item-desc {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .edge-cost-badge {

@@ -26,9 +26,9 @@
             <span class="brand-name">RouteFlow</span>
         </div>
         <ul class="nav-links">
-            <li><a href="#how-it-works">Architecture</a></li>
-            <li><a href="#algorithms">Algorithms</a></li>
             <li><a href="#graph-builder-section">Visualizer</a></li>
+            <li><a href="#algorithms">Algorithms</a></li>
+            <li><a href="#how-it-works">Architecture</a></li>
         </ul>
         <button class="nav-cta" onclick="document.querySelector('.interaction-panel').scrollIntoView({behavior: 'smooth', block: 'center'})">Launch Optimizer</button>
     </nav>
@@ -138,6 +138,102 @@
                 </div>
         </div>
     </main>
+
+    <section class="app-section" id="graph-builder-section">
+        <div class="section-container two-col">
+            <div class="builder-panel glass-panel">
+                <div class="panel-header">
+                    <h2>Graph Builder</h2>
+                    <div class="graph-stats">
+                        <span id="statNodeCount">Nodes: 0</span> | 
+                        <span id="statEdgeCount">Edges: 0</span>
+                    </div>
+                </div>
+                
+                <div class="builder-controls">
+                    <div class="builder-group">
+                        <h3>Add Node</h3>
+                        <div class="input-row">
+                            <input type="text" id="newNodeName" placeholder="e.g. Cache_Service" maxlength="63" class="glass-input" aria-label="New Node Name">
+                            <button id="addNodeBtn" class="secondary-btn" type="button">Add</button>
+                        </div>
+                    </div>
+                    
+                    <div class="builder-group">
+                        <h3>Add Edge</h3>
+                        <div class="input-row edge-row">
+                            <select id="newEdgeFrom" class="glass-select" aria-label="Edge Source"></select>
+                            <span class="arrow-span">→</span>
+                            <select id="newEdgeTo" class="glass-select" aria-label="Edge Destination"></select>
+                            <input type="number" id="newEdgeCost" placeholder="Cost" min="0" class="glass-input num-input" aria-label="Edge Cost">
+                            <button id="addEdgeBtn" class="secondary-btn" type="button">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Active Node List -->
+                    <div class="builder-group">
+                        <div class="list-header-row">
+                            <h3>Current Nodes</h3>
+                            <span class="hint-muted">Click × to remove</span>
+                        </div>
+                        <div class="tag-cloud" id="nodeTagList"></div>
+                    </div>
+
+                    <!-- Active Edge List -->
+                    <div class="builder-group">
+                        <div class="list-header-row">
+                            <h3>Current Edges</h3>
+                            <span class="hint-muted">Click × to remove</span>
+                        </div>
+                        <div class="edge-list-box" id="edgeListBox"></div>
+                    </div>
+                    
+                    <div class="builder-group dropdown-remove-group">
+                        <h3>Quick Dropdown Remove</h3>
+                        <div class="input-row">
+                            <select id="removeNodeSelect" class="glass-select" aria-label="Node to Remove"></select>
+                            <button id="removeNodeBtn" class="danger-btn" type="button">Delete Node</button>
+                        </div>
+                        <div class="input-row" style="margin-top: 0.5rem;">
+                            <select id="removeEdgeSelect" class="glass-select" aria-label="Edge to Remove"></select>
+                            <button id="removeEdgeBtn" class="danger-btn" type="button">Delete Edge</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization-panel glass-panel">
+                <div class="panel-header">
+                    <h2>Graph Visualization</h2>
+                    <div class="viz-actions">
+                        <button id="resetLayoutBtn" class="text-btn" title="Reset layout positions">Auto-Layout</button>
+                        <button id="clearRouteHighlightBtn" class="text-btn" title="Clear highlighted path">Clear Highlight</button>
+                    </div>
+                </div>
+
+                <div class="canvas-legend">
+                    <span class="legend-item"><span class="legend-dot source"></span> Source</span>
+                    <span class="legend-item"><span class="legend-dot dest"></span> Dest</span>
+                    <span class="legend-item"><span class="legend-dot active"></span> Active Route</span>
+                    <span class="legend-item"><span class="legend-dot regular"></span> Service</span>
+                </div>
+
+                <div class="canvas-container" id="fgCanvasContainer">
+                    <canvas id="foregroundCanvas" aria-label="Graph Visualization Canvas"></canvas>
+                    <div class="canvas-tip">💡 Drag any node to reposition on canvas</div>
+                </div>
+
+                <div class="viz-inline-run" style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
+                    <div class="quick-status" id="vizStatusNotice" style="font-size: 0.8rem; color: var(--text-muted);">
+                        Graph in sync with routing model
+                    </div>
+                    <button class="primary-btn" id="vizRunBtn" type="button" style="padding: 0.6rem 1.25rem; font-size: 0.85rem;">
+                        <span>Run Selected Algorithm</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section class="educational-section" id="how-it-works">
         <div class="edu-container">
@@ -276,102 +372,6 @@
         </div>
     </section>
 
-    <section class="app-section" id="graph-builder-section">
-        <div class="section-container two-col">
-            <div class="builder-panel glass-panel">
-                <div class="panel-header">
-                    <h2>Graph Builder</h2>
-                    <div class="graph-stats">
-                        <span id="statNodeCount">Nodes: 0</span> | 
-                        <span id="statEdgeCount">Edges: 0</span>
-                    </div>
-                </div>
-                
-                <div class="builder-controls">
-                    <div class="builder-group">
-                        <h3>Add Node</h3>
-                        <div class="input-row">
-                            <input type="text" id="newNodeName" placeholder="e.g. Cache_Service" maxlength="63" class="glass-input" aria-label="New Node Name">
-                            <button id="addNodeBtn" class="secondary-btn" type="button">Add</button>
-                        </div>
-                    </div>
-                    
-                    <div class="builder-group">
-                        <h3>Add Edge</h3>
-                        <div class="input-row edge-row">
-                            <select id="newEdgeFrom" class="glass-select" aria-label="Edge Source"></select>
-                            <span class="arrow-span">→</span>
-                            <select id="newEdgeTo" class="glass-select" aria-label="Edge Destination"></select>
-                            <input type="number" id="newEdgeCost" placeholder="Cost" min="0" class="glass-input num-input" aria-label="Edge Cost">
-                            <button id="addEdgeBtn" class="secondary-btn" type="button">Add</button>
-                        </div>
-                    </div>
-
-                    <!-- Active Node List -->
-                    <div class="builder-group">
-                        <div class="list-header-row">
-                            <h3>Current Nodes</h3>
-                            <span class="hint-muted">Click × to remove</span>
-                        </div>
-                        <div class="tag-cloud" id="nodeTagList"></div>
-                    </div>
-
-                    <!-- Active Edge List -->
-                    <div class="builder-group">
-                        <div class="list-header-row">
-                            <h3>Current Edges</h3>
-                            <span class="hint-muted">Click × to remove</span>
-                        </div>
-                        <div class="edge-list-box" id="edgeListBox"></div>
-                    </div>
-                    
-                    <div class="builder-group dropdown-remove-group">
-                        <h3>Quick Dropdown Remove</h3>
-                        <div class="input-row">
-                            <select id="removeNodeSelect" class="glass-select" aria-label="Node to Remove"></select>
-                            <button id="removeNodeBtn" class="danger-btn" type="button">Delete Node</button>
-                        </div>
-                        <div class="input-row" style="margin-top: 0.5rem;">
-                            <select id="removeEdgeSelect" class="glass-select" aria-label="Edge to Remove"></select>
-                            <button id="removeEdgeBtn" class="danger-btn" type="button">Delete Edge</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="visualization-panel glass-panel">
-                <div class="panel-header">
-                    <h2>Graph Visualization</h2>
-                    <div class="viz-actions">
-                        <button id="resetLayoutBtn" class="text-btn" title="Reset layout positions">Auto-Layout</button>
-                        <button id="clearRouteHighlightBtn" class="text-btn" title="Clear highlighted path">Clear Highlight</button>
-                    </div>
-                </div>
-
-                <div class="canvas-legend">
-                    <span class="legend-item"><span class="legend-dot source"></span> Source</span>
-                    <span class="legend-item"><span class="legend-dot dest"></span> Dest</span>
-                    <span class="legend-item"><span class="legend-dot active"></span> Active Route</span>
-                    <span class="legend-item"><span class="legend-dot regular"></span> Service</span>
-                </div>
-
-                <div class="canvas-container" id="fgCanvasContainer">
-                    <canvas id="foregroundCanvas" aria-label="Graph Visualization Canvas"></canvas>
-                    <div class="canvas-tip">💡 Drag any node to reposition on canvas</div>
-                </div>
-
-                <div class="viz-inline-run" style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-                    <div class="quick-status" id="vizStatusNotice" style="font-size: 0.8rem; color: var(--text-muted);">
-                        Graph in sync with routing model
-                    </div>
-                    <button class="primary-btn" id="vizRunBtn" type="button" style="padding: 0.6rem 1.25rem; font-size: 0.85rem;">
-                        <span>Run Selected Algorithm</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section class="app-section" id="insight-history-section">
         <div class="section-container two-col">
             <div class="insight-panel glass-panel">
@@ -418,6 +418,6 @@
         <p>&copy; 2026 RouteFlow &mdash; API Request Route Optimizer &bull; Final Year DSA Project</p>
     </footer>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=4"></script>
 </body>
 </html>
